@@ -74,7 +74,7 @@ namespace Cloud5mins.Function
 
                 using (var reader = new StreamReader(req.Body))
                 {
-                    var strBody = reader.ReadToEnd();
+                    var strBody = await reader.ReadToEndAsync();
                     input = JsonSerializer.Deserialize<ShortRequest>(strBody, new JsonSerializerOptions {PropertyNameCaseInsensitive = true});
                     if (input == null)
                     {
