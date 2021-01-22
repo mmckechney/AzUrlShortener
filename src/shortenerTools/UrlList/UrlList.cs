@@ -25,13 +25,16 @@ using System.Net.Http;
 using Cloud5mins.domain;
 using Microsoft.Extensions.Configuration;
 using System.Linq;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Features;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Cloud5mins.Function
 {
     public static class UrlList
     {
         [FunctionName("UrlList")]
-        public static async Task<HttpResponseMessage> Run(
+        public static async Task<IActionResult> Run(
         [HttpTrigger(AuthorizationLevel.Function, "get", Route = null)]HttpRequestMessage req, 
         ILogger log, 
         ExecutionContext context)
@@ -59,10 +62,10 @@ namespace Cloud5mins.Function
             catch (Exception ex)
             {
                 log.LogError(ex, "An unexpected error was encountered.");
-                return req.CreateResponse(HttpStatusCode.BadRequest, ex);
+                return new BadRequestObjectResult(ex);
             }
 
-            return req.CreateResponse(HttpStatusCode.OK, result);
+            return new OkObjectResult(result);
         }
     }
 }

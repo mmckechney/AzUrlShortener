@@ -107,37 +107,73 @@ else
     </Modal>
 }
 
+@if (ShowErrorPopup)
+{
+    <Modal Title="Error" ClosePopup="ClosePopup">
+        <h2>There was a problem:</h2>
+        <p>@errorMessage</p>
+    </Modal>
+}
+
+
 
 
 @code
 {
     bool ShowCreatePopup = false;
     bool ShowEditPopup = false;
+    bool ShowErrorPopup = false;
     ShortUrlRequest shortUrlRequest = new ShortUrlRequest();
     ShortUrlEntity editedUrl;
     ShortUrlList UrlList;
+    string errorMessage = string.Empty;
 
     void ClosePopup()
     {
         ShowCreatePopup = false;
         ShowEditPopup = false;
+        ShowErrorPopup = false;
     }
     private async Task SaveShortUrl()
     {
         ShowCreatePopup = false;
         await UrlService.CreateShortUrl(shortUrlRequest);
-        UrlList = await UrlService.GetUrlList();
+        try
+        {
+            UrlList = await UrlService.GetUrlList();
+        }
+        catch(Exception exe)
+        {
+            errorMessage = exe.Message;
+            ShowErrorPopup = true;
+        }
     }
 
     private async Task SaveUpdatedShortUrl()
     {
         ShowEditPopup = false;
-        await UrlService.UpdateShortUrl(editedUrl);
-        UrlList = await UrlService.GetUrlList();
+
+        try
+        {
+            await UrlService.UpdateShortUrl(editedUrl);
+            UrlList = await UrlService.GetUrlList();
+        }
+        catch (Exception exe)
+        {
+            errorMessage = exe.Message;
+            ShowErrorPopup = true;
+        }
     }
     protected override async Task OnParametersSetAsync()
     {
-        UrlList = await UrlService.GetUrlList();
+        try {
+            UrlList = await UrlService.GetUrlList();
+        }
+        catch (Exception exe)
+        {
+            errorMessage = exe.Message;
+            ShowErrorPopup = true;
+        }
     }
 
     [Authorize(Roles = "admin")]
@@ -158,9 +194,16 @@ else
     [Authorize(Roles = "admin")]
     public async Task ArchiveShortUrl(ShortUrlEntity urlEntity)
     {
-        await UrlService.ArchiveShortUrl(urlEntity);
-        UrlList = await UrlService.GetUrlList();
-    }
+        try {
+            await UrlService.ArchiveShortUrl(urlEntity);
+            UrlList = await UrlService.GetUrlList();
+        }
+        catch (Exception exe)
+        {
+            errorMessage = exe.Message;
+            ShowErrorPopup = true;
+        }
+     }
 
 
     [Inject] public IJSRuntime JsRuntime { get; set; }

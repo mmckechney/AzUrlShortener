@@ -37,13 +37,14 @@ using System.Net;
 using System.Net.Http;
 using Cloud5mins.domain;
 using Microsoft.Extensions.Configuration;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Cloud5mins.Function
 {
     public static class UrlUpdate
     {
         [FunctionName("UrlUpdate")]
-        public static async Task<HttpResponseMessage> Run(
+        public static async Task<IActionResult> Run(
         [HttpTrigger(AuthorizationLevel.Function, "post", Route = null)]HttpRequestMessage req, 
         ILogger log, 
         ExecutionContext context)
@@ -53,26 +54,26 @@ namespace Cloud5mins.Function
             // Validation of the inputs
             if (req == null)
             {
-                return req.CreateResponse(HttpStatusCode.NotFound);
+                return new NotFoundObjectResult(null);
             }
 
             ShortUrlEntity input = await req.Content.ReadAsAsync<ShortUrlEntity>();
             if (input == null)
             {
-                return req.CreateResponse(HttpStatusCode.NotFound);
+                return new NotFoundObjectResult(null);
             }
 
 
             // If the Url parameter only contains whitespaces or is empty return with BadRequest.
             if (string.IsNullOrWhiteSpace(input.Url))
             {
-                return req.CreateErrorResponse(HttpStatusCode.BadRequest, "The url parameter can not be empty.");
+                return new BadRequestObjectResult("The url parameter can not be empty.");
             }
 
             // Validates if input.url is a valid aboslute url, aka is a complete refrence to the resource, ex: http(s)://google.com
             if (!Uri.IsWellFormedUriString(input.Url, UriKind.Absolute))
             {
-                return req.CreateErrorResponse(HttpStatusCode.BadRequest, $"{input.Url} is not a valid absolute Url. The Url parameter must start with 'http://' or 'http://'.");
+                return new BadRequestObjectResult($"{input.Url} is not a valid absolute Url. The Url parameter must start with 'http://' or 'http://'.");
             }
 
             ShortUrlEntity result;
@@ -94,10 +95,10 @@ namespace Cloud5mins.Function
             catch (Exception ex)
             {
                 log.LogError(ex, "An unexpected error was encountered.");
-                return req.CreateResponse(HttpStatusCode.BadRequest, ex);
+                return new BadRequestObjectResult(ex);
             }
 
-            return req.CreateResponse(HttpStatusCode.OK, result);
+            return new OkObjectResult(result);
         }
     }
 }

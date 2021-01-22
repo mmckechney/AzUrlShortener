@@ -275,3 +275,7 @@ src/adminTools/adminBlazorWebsite/src/appsettings.Development.json
 
 #Igniore VSCode User Setting
 **/.vscode/settings.json
+/src/adminTools/adminBlazorWebsite/src/Properties/PublishProfiles/
+/src/adminTools/adminBlazorWebsite/src/Properties/ServiceDependencies/
+/src/shortenerTools/Properties/PublishProfiles/
+/src/shortenerTools/Properties/ServiceDependencies/

@@ -7,13 +7,14 @@ using System.Net;
 using System.Net.Http;
 using Cloud5mins.domain;
 using Microsoft.Extensions.Configuration;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Cloud5mins.Function
 {
     public static class UrlClickStats
     {
         [FunctionName("UrlClickStats")]
-        public static async Task<HttpResponseMessage> Run(
+        public static async Task<IActionResult> Run(
         [HttpTrigger(AuthorizationLevel.Function, "post", Route = null)]HttpRequestMessage req, 
         ILogger log, 
         ExecutionContext context)
@@ -23,13 +24,13 @@ namespace Cloud5mins.Function
             // Validation of the inputs
             if (req == null)
             {
-                return req.CreateResponse(HttpStatusCode.NotFound);
+                return new NotFoundObjectResult(null);
             }
 
             UrlClickStatsRequest input = await req.Content.ReadAsAsync<UrlClickStatsRequest>();
             if (input == null)
             {
-                return req.CreateResponse(HttpStatusCode.NotFound);
+                return new NotFoundObjectResult(null);
             }
 
             var result = new ClickStatsEntityList();
@@ -48,10 +49,10 @@ namespace Cloud5mins.Function
             catch (Exception ex)
             {
                 log.LogError(ex, "An unexpected error was encountered.");
-                return req.CreateResponse(HttpStatusCode.BadRequest, ex);
+                return new BadRequestObjectResult(ex); ;
             }
 
-            return req.CreateResponse(HttpStatusCode.OK, result);
+            return new OkObjectResult(result);
         }
     }
 }
