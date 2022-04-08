@@ -65,7 +65,7 @@ namespace Cloud5mins.Function
             }
 
             // Validates if input.url is a valid aboslute url, aka is a complete refrence to the resource, ex: http(s)://google.com
-            if (!input.Url.ToLower().StartsWith("http://") && !input.Url.ToLower().StartsWith("https://"))
+            if (!input.Url.ToLower().StartsWith("http://") && !input.Url.ToLower().StartsWith("https://") && !input.Url.ToLower().StartsWith("onenote:https://"))
             {
                 return new BadRequestObjectResult($"{input.Url} is not a valid absolute Url. The Url parameter must start with 'http://' or 'http://'.");
             }
